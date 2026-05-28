@@ -478,13 +478,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       <div class="kpi ph" style="font-size:12px;color:var(--text3)">— a definir —</div>
     </div>
 
-    <div class="bq">
-      <div class="bqh"><i class="ti ti-alert-triangle" style="color:var(--red)"></i>Bloqueos activos<span class="tag td" id="bloq-badge">3 críticos</span></div>
-      <div class="bql">
-        <div class="bqi"><div class="bqd r"></div><div><div class="bqt">Sistema de ejes — proveedor marcó 2 interferencias (Too Close): bolsa de aire vs rueda y cámara de freno vs brazo · Ing. Berta debe validar</div><div class="bqo">Ing. Adrián Berta (Ombú Ingeniería) · Pendiente respuesta</div></div></div>
-        <div class="bqi"><div class="bqd r"></div><div><div class="bqt">Elástico de suspensión — anticipo 30% = USD 6.612,48 pendiente de pago · Sin pago no arranca producción</div><div class="bqo">Ombú Compras (Constanza / Agustina) · PI + PL ya enviados</div></div></div>
-        <div class="bqi"><div class="bqd r"></div><div><div class="bqt">Llantas acero — OC 50011837 emitida · PI + PL enviados · Anticipo pendiente · Sin pago no arranca producción</div><div class="bqo">Ombú Compras · Anticipo pendiente</div></div></div>
-      </div>
+    <div class="bq" id="bloq-panel">
+      <div class="bqh"><i class="ti ti-alert-triangle" style="color:var(--red)"></i>Bloqueos activos<span class="tag td" id="bloq-badge">—</span></div>
+      <div class="bql" id="bloq-list"></div>
     </div>
 
     <p class="sl">Flujo de trabajo</p>
@@ -742,7 +738,7 @@ function isBamboo(){return role==='bamboo';}
 // ── STORAGE ──
 async function save2(id,d){mem['ok_'+id]=d;try{await window.storage.set('ok_'+id,JSON.stringify(d),true);}catch(e){}}
 async function load2(id){if(mem['ok_'+id])return mem['ok_'+id];try{var r=await window.storage.get('ok_'+id,true);if(r&&r.value){mem['ok_'+id]=JSON.parse(r.value);return mem['ok_'+id];}}catch(e){}return null;}
-async function loadAll(){for(var item of ITEMS){var d=await load2(item.id);if(d)applyData(item.id,d);}recalcAll();}
+async function loadAll(){for(var item of ITEMS){var d=await load2(item.id);if(d)applyData(item.id,d);}recalcAll();renderBloqs();}
 
 function gv(id){var e=document.getElementById(id);return e?e.value:'';}
 function sv(id,v){var e=document.getElementById(id);if(e&&v!==undefined&&v!==null)e.value=v;}
@@ -1138,7 +1134,6 @@ async function saveModal(){
   setTimeout(function(){
     btn.classList.remove('saved'); btn.innerHTML='<i class="ti ti-device-floppy"></i> Guardar cambios';
     closeModal();
-    // Re-render items
     render();
     loadAll();
   },1000);
@@ -1164,23 +1159,11 @@ applyData=function(id,d){
 };
 
 
-// Auto-calculate bloqueos badge
-function updateBloqBadge(){
-  var reds=document.querySelectorAll('.bqd.r').length;
-  var yellows=document.querySelectorAll('.bqd.y').length;
-  var badge=document.getElementById('bloq-badge');
-  if(!badge) return;
-  var txt='';
-  if(reds>0) txt+=reds+' crítico'+(reds>1?'s':'');
-  if(reds>0&&yellows>0) txt+=' · ';
-  if(yellows>0) txt+=yellows+' atención';
-  badge.textContent=txt||'Sin bloqueos';
-  badge.className=reds>0?'tag td':'tag tw';
-}
+function updateBloqBadge(){} // replaced by renderBloqs
 
 // call on login
 var _origRender=render;
-render=function(){_origRender();updateBloqBadge();updateCounts();};
+render=function(){_origRender();updateCounts();renderBloqs();};
 
 // Auto-update item counts in tabs and KPI after render
 function updateCounts(){
@@ -1212,6 +1195,44 @@ function updateCounts(){
     var count=fase==='todos'?total:(faseCounts[fase]||0);
     btn.textContent=label+' ('+count+')';
   });
+}
+
+
+// ═══════════════════════════════════════════
+//  AUTO-RENDER BLOQUEOS FROM ITEMS
+// ═══════════════════════════════════════════
+function renderBloqs(){
+  var list = document.getElementById('bloq-list');
+  var badge = document.getElementById('bloq-badge');
+  if(!list) return;
+
+  // Collect all items with non-empty imp
+  var activos = ITEMS.filter(function(item){
+    return item.imp && item.imp.trim() !== '';
+  });
+
+  if(activos.length === 0){
+    list.innerHTML = '<div style="font-size:13px;color:var(--text3);font-style:italic">Sin bloqueos activos</div>';
+    if(badge){ badge.textContent = 'Sin bloqueos'; badge.className = 'tag tm'; }
+    document.getElementById('bloq-panel').style.borderColor = 'var(--border)';
+    return;
+  }
+
+  list.innerHTML = activos.map(function(item){
+    return '<div class="bqi">' +
+      '<div class="bqd r"></div>' +
+      '<div>' +
+        '<div class="bqt"><strong>' + item.nombre + '</strong> — ' + item.imp + '</div>' +
+        (item.impo ? '<div class="bqo">' + item.impo + '</div>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  if(badge){
+    badge.textContent = activos.length + ' bloqueo' + (activos.length > 1 ? 's' : '');
+    badge.className = 'tag td';
+  }
+  document.getElementById('bloq-panel').style.borderColor = 'rgba(239,68,68,.3)';
 }
 
 </script>
