@@ -341,6 +341,101 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   .kg  { grid-template-columns: 1fr; }
   .pi  { grid-template-columns: 1fr !important; }
 }
+
+/* ══ EDIT MODAL ══ */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,.7);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 1rem; overflow-y: auto;
+}
+.modal-overlay.hidden { display: none; }
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  width: 100%; max-width: 680px;
+  margin: auto;
+  overflow: hidden;
+}
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-title { font-size: 15px; font-weight: 600; }
+.modal-close {
+  background: none; border: none; color: var(--text2);
+  font-size: 20px; cursor: pointer; padding: 2px 6px;
+  border-radius: 4px; transition: all .15s;
+}
+.modal-close:hover { background: var(--bg3); color: var(--text); }
+.modal-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; max-height: 75vh; overflow-y: auto; }
+.modal-section { display: flex; flex-direction: column; gap: 8px; }
+.modal-section-title {
+  font-size: 9px; font-weight: 700; color: var(--text3);
+  text-transform: uppercase; letter-spacing: .07em;
+  font-family: var(--mono); margin-bottom: 2px;
+  padding-bottom: 6px; border-bottom: 1px solid var(--border);
+}
+.mrow { display: flex; flex-direction: column; gap: 4px; }
+.mrow label { font-size: 11px; color: var(--text2); font-family: var(--mono); }
+.mrow input[type=text], .mrow textarea, .mrow select {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--rs); padding: 8px 10px;
+  color: var(--text); font-family: var(--sans); font-size: 13px;
+  outline: none; width: 100%; transition: border-color .15s;
+}
+.mrow input[type=text]:focus, .mrow textarea:focus, .mrow select:focus { border-color: var(--accent); }
+.mrow textarea { resize: vertical; min-height: 60px; }
+.mrow select option { background: var(--bg2); }
+.mrow-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media(max-width:500px){ .mrow-grid { grid-template-columns: 1fr; } }
+
+/* FASE SELECTOR */
+.fase-sel { display: flex; gap: 4px; flex-wrap: wrap; }
+.fase-opt {
+  padding: 5px 10px; font-size: 10px; font-weight: 700;
+  font-family: var(--mono); border-radius: 4px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--bg3);
+  color: var(--text3); transition: all .15s;
+}
+.fase-opt:hover { border-color: var(--accent); color: var(--accent); }
+.fase-opt.sel-done { background: var(--gbg); border-color: rgba(34,197,94,.4); color: var(--green); }
+.fase-opt.sel-active { background: var(--ybg); border-color: rgba(245,158,11,.4); color: var(--yellow); }
+
+.modal-foot {
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: flex-end; gap: 8px;
+}
+.btn-cancel {
+  padding: 8px 16px; background: none;
+  border: 1px solid var(--border); border-radius: var(--rs);
+  color: var(--text2); font-family: var(--sans); font-size: 13px; cursor: pointer;
+  transition: all .15s;
+}
+.btn-cancel:hover { border-color: var(--border2); color: var(--text); }
+.btn-save-modal {
+  padding: 8px 18px; background: var(--accent);
+  border: none; border-radius: var(--rs);
+  color: #fff; font-family: var(--sans); font-size: 13px;
+  font-weight: 600; cursor: pointer; transition: opacity .15s;
+  display: flex; align-items: center; gap: 6px;
+}
+.btn-save-modal:hover { opacity: .85; }
+.btn-save-modal.saved { background: var(--green); }
+
+/* EDIT ITEM BUTTON in card */
+.edit-item-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; background: transparent;
+  border: 1px solid var(--border); border-radius: var(--rs);
+  color: var(--text2); font-family: var(--sans); font-size: 11px;
+  cursor: pointer; transition: all .15s; margin-left: auto;
+}
+.edit-item-btn:hover { border-color: var(--yellow); color: var(--yellow); }
 </style>
 </head>
 <body>
@@ -377,20 +472,18 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 
   <div class="mn">
     <div class="kg" style="margin-top:1rem">
-      <div class="kpi"><div class="kl">Ítems activos</div><div class="kv">13</div><div class="ks2">En seguimiento</div></div>
+      <div class="kpi"><div class="kl">Ítems activos</div><div class="kv">11</div><div class="ks2">En seguimiento</div></div>
       <div class="kpi"><div class="kl">Ahorro anual proyectado</div><div class="kv" id="kt">—</div><div class="ks2" id="ksub">Completar datos por ítem</div></div>
       <div class="kpi ph" style="font-size:12px;color:var(--text3)">— a definir —</div>
       <div class="kpi ph" style="font-size:12px;color:var(--text3)">— a definir —</div>
     </div>
 
     <div class="bq">
-      <div class="bqh"><i class="ti ti-alert-triangle" style="color:var(--red)"></i>Bloqueos activos<span class="tag td">2 críticos · 3 atención</span></div>
+      <div class="bqh"><i class="ti ti-alert-triangle" style="color:var(--red)"></i>Bloqueos activos<span class="tag td" id="bloq-badge">3 críticos</span></div>
       <div class="bql">
-        <div class="bqi"><div class="bqd r"></div><div><div class="bqt">B/L y documentos no recibidos de Globe Steel (Guardaciclista) ni de Kemi Global (Paragolpes + Vigas de batea) — en tránsito desde 16/05/2026</div><div class="bqo">Bamboo gestiona con ambos proveedores · Urgente · Arribo estimado 20/07/2026</div></div></div>
-        <div class="bqi"><div class="bqd r"></div><div><div class="bqt">Vigas de remolque — saldo 70% pendiente de recalcular y pagar a Kemi (ajuste de 23 a 20 sets de 9,60m) · Sin pago no hay producción terminada ni B/L</div><div class="bqo">Bamboo gestiona con Kemi · Antes del ~05/06/2026</div></div></div>
-        <div class="bqi"><div class="bqd r"></div><div><div class="bqt">Sistema de ejes — 4 puntos técnicos pendientes de validación por Ing. Berta (Ombú) antes de avanzar a prueba en fábrica</div><div class="bqo">Ing. Adrián Berta (Ombú Ingeniería) · Pendiente respuesta</div></div></div>
-        <div class="bqi"><div class="bqd y"></div><div><div class="bqt">Puerta de batea — definir tratamiento superficial con proveedor (primer soldable vs aceite anticorrosivo tipo Tala) · Sebastián Cremona respondió, falta decisión final</div><div class="bqo">Bamboo define con proveedor · MJ Lim coordina</div></div></div>
-        <div class="bqi"><div class="bqd y"></div><div><div class="bqt">Llantas aluminio, llantas acero y patas de apoyo — Ombú tiene muestras, pendiente decisión de compra</div><div class="bqo">Ombú decide · Proveedor: Shandong Luyang Auto Parts</div></div></div>
+        <div class="bqi"><div class="bqd r"></div><div><div class="bqt">Sistema de ejes — proveedor marcó 2 interferencias (Too Close): bolsa de aire vs rueda y cámara de freno vs brazo · Ing. Berta debe validar</div><div class="bqo">Ing. Adrián Berta (Ombú Ingeniería) · Pendiente respuesta</div></div></div>
+        <div class="bqi"><div class="bqd r"></div><div><div class="bqt">Elástico de suspensión — anticipo 30% = USD 6.612,48 pendiente de pago · Sin pago no arranca producción</div><div class="bqo">Ombú Compras (Constanza / Agustina) · PI + PL ya enviados</div></div></div>
+        <div class="bqi"><div class="bqd r"></div><div><div class="bqt">Llantas acero — OC 50011837 emitida · PI + PL enviados · Anticipo pendiente · Sin pago no arranca producción</div><div class="bqo">Ombú Compras · Anticipo pendiente</div></div></div>
       </div>
     </div>
 
@@ -409,17 +502,81 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 
     <p class="sl">Ítems</p>
     <div class="tabs">
-      <button class="tab on" onclick="fil('todos',this)">Todos (13)</button>
+      <button class="tab on" onclick="fil('todos',this)">Todos (11)</button>
       <button class="tab" onclick="fil('transito',this)">En tránsito (3)</button>
       <button class="tab" onclick="fil('cotizacion',this)">Cotización (1)</button>
-      <button class="tab" onclick="fil('tecnica',this)">Val. técnica (2)</button>
-      <button class="tab" onclick="fil('sourcing',this)">Sourcing (3)</button>
-      <button class="tab" onclick="fil('implementacion',this)">Implementación (2)</button>
-      <button class="tab" onclick="fil('evaluacion',this)">Evaluación (3)</button>
+      <button class="tab" onclick="fil('tecnica',this)">Val. técnica (1)</button>
+      <button class="tab" onclick="fil('sourcing',this)">Sourcing (2)</button>
+      <button class="tab" onclick="fil('implementacion',this)">Implementación (3)</button>
+      <button class="tab" onclick="fil('evaluacion',this)">Evaluación (1)</button>
     </div>
 
     <div class="ig2" id="ig2"></div>
   </div>
+
+<!-- ═══ EDIT MODAL ═══ -->
+<div class="modal-overlay hidden" id="edit-modal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title" id="modal-item-name">Editar ítem</span>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- FASE -->
+      <div class="modal-section">
+        <div class="modal-section-title">Fase actual</div>
+        <div class="fase-sel" id="modal-fase-sel"></div>
+      </div>
+
+      <!-- PRÓXIMO PASO -->
+      <div class="modal-section">
+        <div class="modal-section-title">Próximo paso</div>
+        <div class="mrow"><label>Descripción</label><textarea id="modal-ns" rows="2"></textarea></div>
+        <div class="mrow"><label>Responsable / nota</label><input type="text" id="modal-nso"/></div>
+      </div>
+
+      <!-- IMPORTANTE -->
+      <div class="modal-section">
+        <div class="modal-section-title">Bloqueo / Importante (dejar vacío si no hay)</div>
+        <div class="mrow"><label>Descripción del bloqueo</label><textarea id="modal-imp" rows="2"></textarea></div>
+        <div class="mrow"><label>Responsable / fecha</label><input type="text" id="modal-impo"/></div>
+      </div>
+
+      <!-- PROVEEDOR -->
+      <div class="modal-section">
+        <div class="modal-section-title">Proveedor</div>
+        <div class="mrow-grid">
+          <div class="mrow"><label>Nombre</label><input type="text" id="modal-prov-nombre"/></div>
+          <div class="mrow"><label>Región</label><input type="text" id="modal-prov-region"/></div>
+          <div class="mrow"><label>Incoterm</label><input type="text" id="modal-prov-incoterm"/></div>
+          <div class="mrow"><label>Invoice</label><input type="text" id="modal-prov-invoice"/></div>
+        </div>
+      </div>
+
+      <!-- COMERCIAL -->
+      <div class="modal-section">
+        <div class="modal-section-title">Comercial</div>
+        <div class="mrow-grid">
+          <div class="mrow"><label>Lead time</label><input type="text" id="modal-com-lead"/></div>
+          <div class="mrow"><label>Términos de pago</label><input type="text" id="modal-com-pago"/></div>
+          <div class="mrow"><label>MOQ</label><input type="text" id="modal-com-moq"/></div>
+          <div class="mrow"><label>Contenedor</label><input type="text" id="modal-com-cont"/></div>
+          <div class="mrow"><label>Puerto de salida</label><input type="text" id="modal-com-puerto"/></div>
+          <div class="mrow"><label>Nota comercial</label><input type="text" id="modal-com-nota"/></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save-modal" id="modal-save-btn" onclick="saveModal()">
+        <i class="ti ti-device-floppy"></i> Guardar cambios
+      </button>
+    </div>
+  </div>
+</div>
+
 </div>
 
 <script>
@@ -438,133 +595,122 @@ var TEC_FIELDS=[
 
 var ITEMS=[
   {id:'p1',nombre:'Guardaciclista de aluminio',fase:'transito',fases:[1,1,1,1,1,1,1,2,0],
-   ns:'Recibir B/L y documentos de Globe Steel · Coordinar aduana con Zanoletti en Rosario',
-   nso:'NCM resuelto ✓ · Constanza (Ombú) confirmó: semirremolques y acoplados, no chasis camión · Partes terminadas listas para ensamblar · Globe Steel pago completo ✓',
+   ns:'Arribo estimado 13/07/2026 · Rosario · Coordinar con Zanoletti para el despacho',
+   nso:'B/L recibida ✓ · NCM resuelto ✓ · Globe Steel pago completo ✓',
    tec:{nombre:'Tabla guardaciclista aluminio',tipo:'Pieza bajo plano · perfil extruido',prod_final:'Acoplados y semirremolques',material:'Aluminio 6063-T5',peso:'Variable (0,92–3,52 kg/u)',dimensiones:'Sección 102×30 mm · Longitudes: 600/800/1.300/1.600/2.300 mm',nota:'Powder coat RAL 7021 · 5 variantes · Inspección 01/04/2026: OK'},
    refs:['812339','812322','812323','812324','812326'],
    prov:{Nombre:'Globe Steel Trading Co., Ltd.',Región:'Shanghai · Guangzhou, China',Incoterm:'FOB Guangzhou',Invoice:'GB-20251106'},
    pagos:[{l:'Anticipo 30%',ok:true,d:'22/12/2025'},{l:'Saldo 70%',ok:true,d:'07/05/2026'}],
-   com:{Lead:'90 días producción',Pago:'T/T 30% · 70% vs B/L',MOQ:'3.100 pcs (1×20ft)',Contenedor:'3.100 pcs · 1×20ft · ~6.000 kg',Puerto:'Guangzhou',Nota:'Molde incluido una vez'},
+   com:{'Lead':'A confirmar','Pago':'A definir','MOQ':'A confirmar','Contenedor':'A confirmar','Puerto':'A definir','Flete':'','Arribo est.':'13/07/2026 · Rosario','Nota':''},
    pu:'u',vol:'6200',fecha:'2026-05-20'},
 
   {id:'p2',nombre:'Paragolpes acero',fase:'transito',fases:[1,1,1,1,1,1,1,2,0],
    ns:'Recibir B/L y documentos de Kemi · Enviar al despachante en Rosario · Invoice actualizada a 28 pcs ✓',
-   nso:'Arribo estimado 20/07/2026 · Salida Qingdao 16/05/2026',
-   imp:'',
-   impo:'',
+   nso:'B/L recibida ✓ · Kemi pago completo ✓',
+   
    tec:{nombre:'Conjunto soldado paragolpes tubular',tipo:'Pieza bajo plano · conjunto soldado',prod_final:'Acoplados y semirremolques',material:'Acero Q355B + SAE 1010',peso:'~78,95 kg/u',dimensiones:'2.400 mm long. × 450 mm alto',nota:'12 subconjuntos · Rigidizadores, ménsulas y soportes · Rev. 4'},
    refs:['027397'],
    prov:{Nombre:'Kemi Global Trading Co.',Región:'Guangzhou, China',Incoterm:'FOB Qingdao',Invoice:'GL-20251128'},
    pagos:[{l:'Anticipo 30%',ok:true,d:'22/12/2025'},{l:'Saldo 70%',ok:true,d:'11/05/2026'}],
-   com:{Lead:'12 días producción',Pago:'T/T 30% · 70% vs B/L',MOQ:'A confirmar',Contenedor:'28 u · 1×40HC (compartido)',Puerto:'Qingdao','Arribo est.':'20/07/2026 · Rosario'},
+   com:{'Lead':'A confirmar','Pago':'A definir','MOQ':'A confirmar','Contenedor':'A confirmar','Puerto':'A definir','Flete':'','Arribo est.':'20/07/2026 · Rosario','Nota':''},
    pu:'u',vol:'',fecha:''},
 
   {id:'p3',nombre:'Vigas de batea',fase:'transito',fases:[1,1,1,1,1,1,1,2,0],
-   ns:'Recibir B/L y documentos · Enviar al despachante en Rosario',
-   nso:'Mismo contenedor que Paragolpes · Salida 16/05/2026 · Arribo estimado 20/07/2026',
+   ns:'Arribo estimado 20/07/2026 · Rosario · Coordinar con Zanoletti para el despacho',
+   nso:'B/L recibida ✓ · Kemi pago completo ✓ · Mismo contenedor que Paragolpes',
    tec:{nombre:'Vigas de batea',tipo:'Pieza bajo plano · par',prod_final:'Chasis batea 27–30m³',material:'Acero (ver planos)',peso:'~855 kg/set',dimensiones:'9.170 mm longitud',nota:'Par: viga izq. 040048 (Rev.1) + viga der. 040049 (Rev.2) · Mismo 40HC que Paragolpes'},
    refs:['040048','040049'],
    prov:{Nombre:'Kemi Global Trading Co.',Región:'Guangzhou, China',Incoterm:'FOB Qingdao',Invoice:'GL-20251128'},
    pagos:[{l:'Anticipo 30%',ok:true,d:'22/12/2025'},{l:'Saldo 70%',ok:true,d:'11/05/2026'}],
-   com:{Lead:'12 días producción',Pago:'T/T 30% · 70% vs B/L',MOQ:'28 sets',Contenedor:'28 sets · 1×40HC (compartido)',Puerto:'Qingdao','Arribo est.':'20/07/2026 · Rosario'},
+   com:{'Lead':'A confirmar','Pago':'A definir','MOQ':'A confirmar','Contenedor':'A confirmar','Puerto':'A definir','Flete':'','Arribo est.':'20/07/2026 · Rosario','Nota':''},
    pu:'set',vol:'',fecha:''},
 
-  {id:'p4',nombre:'Puerta de batea',fase:'tecnica',fases:[1,1,1,2,0,0,0,0,0],
-   ns:'Definir tratamiento superficial con proveedor (primer soldable vs aceite anticorrosivo) · Cotizar impacto en precio · Cerrar RFQ',
-   nso:'Sebastián respondió ✓ · Bamboo evalúa opciones con proveedor · MJ Lim coordina',
-   imp:'Sebastián Cremona respondió · 3 opciones: (1) Cera — requiere ensayos previos, (2) Primer soldable — mejor opción técnica, costo a evaluar, (3) Aceite anticorrosivo tipo Tala (Pentre) — más económico, ampliamente disponible · Próximo paso: definir opción con proveedor y cotizar impacto',
-   impo:'Bamboo define con proveedor · MJ Lim coordina',
+  {id:'p4',nombre:'Puerta de batea',fase:'cotizacion',fases:[1,1,1,1,2,0,0,0,0],
+   ns:'MJ Lim lanza RFQ a proveedores con especificación de aceite Sinopec R5326B · Cerrar cotizaciones comparables',
+   nso:'Tratamiento superficial definido ✓ · Aceite Sinopec R5326B aceptado por Ombú para cotización · Validación en planta requerida antes de producción',
    tec:{nombre:'Puerta de batea',tipo:'Pieza bajo plano',prod_final:'Batea volcadora',material:'A confirmar con proveedor',peso:'A completar',dimensiones:'A completar',nota:'3 modelos: 30m³ / 35m³ / 50m³ · Bisagras punteadas (no soldadas completas) · Primer requerido · Ombú aplica: desengrase + fosfatado + pasivado · Granallado + primer manual aceptable (a validar con ensayos)'},
    refs:['040439','040442','037984','037288'],
    prov:{Nombre:'2 proveedores en evaluación',Región:'En evaluación',Incoterm:'A definir'},
    pagos:[],
-   com:{Lead:'A confirmar',Pago:'A definir',MOQ:'A confirmar',Contenedor:'A confirmar',Puerto:'A definir'},
+   com:{'Lead':'A confirmar','Pago':'A definir','MOQ':'A confirmar','Contenedor':'A confirmar','Puerto':'A definir','Flete':'','Arribo est.':'','Nota':''},
    pu:'u',vol:'',fecha:''},
 
   {id:'p5',nombre:'Vigas de remolque',fase:'implementacion',fases:[1,1,1,1,1,1,2,0,0],
-   ns:'Coordinar con Kemi la recalculación del saldo 70% (ajuste de 23 a 20 sets) · Pagar saldo · Gestionar B/L y documentos',
-   nso:'MJ Lim coordina con proveedor · Producción lista ~05/06/2026 · Saldo a pagar contra B/L',
-   imp:'Saldo 70% pendiente de pago a Kemi · Monto a recalcular por ajuste de cantidades (de 23 a 20 sets de 9,60m) · Coordinar con Kemi la nueva liquidación',
-   impo:'Bamboo gestiona con Kemi · Antes de que producción esté lista ~05/06/2026',
+   ns:'Producción estimada lista ~05/06/2026 · Coordinar embarque con Syntrans Qingdao (Lemon Li)',
+   nso:'Zecomex (Mauricio Rivero) coordina embarque · Agente origen: Syntrans Qingdao (Lemon Li) · Julián García confirmó cota 30mm para cortes en C ✓',
+   imp:'Confirmar fecha exacta de producción con MJ',
+   impo:'MJ Lim · Bamboo',
    tec:{nombre:'Vigas de remolque',tipo:'Pieza bajo plano · par por modelo',prod_final:'Chasis acoplado',material:'Acero (ver planos)',peso:'029117/029118: 436 kg/u · 029846/029847: 451 kg/u',dimensiones:'9,30 m (029117/029118) · 9,60 m (029846/029847)',nota:'2 modelos de acoplado · OC Ombú N° 50011308 · Cantidades ajustadas por peso: 10 sets 9,30m + 20 sets 9,60m · Peso total ~26,74 t · 1×40HC'},
    refs:['029117','029118','029846','029847'],
    prov:{Nombre:'Kemi Global Trading Co.',Región:'Guangzhou, China',Incoterm:'FOB Qingdao',Invoice:'GL-202602'},
    pagos:[{l:'Anticipo 30%',ok:true,d:'11/05/2026'},{l:'Saldo 70%',ok:false,d:''}],
-   com:{Lead:'21 días producción',Pago:'T/T 30% · 70% vs B/L',MOQ:'30 sets (1×40HC)',Contenedor:'30 sets · 1×40HC · ~26,74 t',Puerto:'Qingdao','Prod. lista est.':'~05/06/2026'},
+   com:{'Lead':'A confirmar','Pago':'A definir','MOQ':'A confirmar','Contenedor':'A confirmar','Puerto':'A definir','Flete':'','Arribo est.':'','Nota':''},
    pu:'set',vol:'',fecha:''},
 
   
 
   {id:'p7',nombre:'Sistema de ejes completo',fase:'tecnica',fases:[1,1,1,2,0,0,0,0,0],
-   ns:'Ing. Berta (Ombú) debe validar 4 puntos técnicos: actuadores de freno 230mm, elevación eje 1, air spring Firestone 6348 y rotación pulmón de freno 45°',
-   nso:'Juan aguarda respuesta de Berta · Proveedor adaptando diseño al mercado argentino',
-   imp:'4 puntos técnicos pendientes de validación por Ombú antes de avanzar a prueba en fábrica',
+   ns:'Ing. Berta debe revisar 2 puntos críticos marcados como Too Close por el proveedor: bolsa de aire vs rueda/maza · cámara de freno vs brazo de suspensión',
+   nso:'Plano actualizado enviado a Berta el 27/05/2026 · Proveedor incorporó correcciones de Ombú · Pendiente respuesta',
+   imp:'Proveedor marcó 2 interferencias potenciales (Too Close) en conjunto 1+2 que requieren validación de Ombú antes de cerrar diseño',
    impo:'Ing. Adrián Berta (Ombú Ingeniería) · Pendiente respuesta',
    tec:{nombre:'Sistema de ejes 13T configuración 1+2',tipo:'Kit externo · desarrollo conjunto',prod_final:'Acoplados y semirremolques',material:'Acero estructural · eje Ø127×19mm',peso:'A confirmar con proveedor',dimensiones:'Track 1.890mm · Long. total ~2.216mm',nota:'Config. 1+2: eje direccional elevable (neumático) + tándem 2 ejes mecánicos · ABS incluido · Regulador automático · Freno tambor Ø420×203 · Rodamiento HM518445/10 · Air spring Firestone 6348 propuesto'},
    refs:[],
    prov:{Nombre:'Shandong JinSheng Axle Mfg. Co., Ltd.',Región:'Shandong, China',Incoterm:'A definir'},
    pagos:[],
-   com:{Lead:'A confirmar',Pago:'A definir',MOQ:'A confirmar',Contenedor:'A confirmar',Puerto:'A definir'},
+   com:{'Lead':'A confirmar','Pago':'A definir','MOQ':'A confirmar','Contenedor':'A confirmar','Puerto':'A definir','Flete':'','Arribo est.':'','Nota':''},
    pu:'kit',vol:'',fecha:''},
 
   {id:'p8',nombre:'Elástico de suspensión estándar',fase:'implementacion',fases:[1,1,1,1,1,1,2,0,0],
-   ns:'Ombú emite OC · Coordinar pago anticipo y arranque de producción con Shandong Luyang',
-   nso:'Juan envió datos de proveedor a compras Ombú · Santiago Vega (Ombú Compras) emite OC',
-   tec:{nombre:'Elástico de suspensión mecánica',tipo:'Pieza estándar según plano Ombú',prod_final:'Acoplados y semirremolques',material:'Acero muelle',peso:'A completar',dimensiones:'Según plano actualizado Ombú',nota:'Proveedor: Shandong Luyang Auto Parts · USD 53,76/u FOB Qingdao · 410 u/contenedor'},
+   ns:'Ombú paga anticipo 30% = USD 6.612,48 para iniciar producción',
+   nso:'OC 50011830 ✓ · PI + PL enviados ✓ · Sin pago no arranca producción',
+   imp:'Pago anticipo 30% = USD 6.612,48 pendiente · Sin este pago no inicia la producción',
+   impo:'Ombú Compras (Constanza / Agustina) · Urgente',
+   tec:{nombre:'Elástico de suspensión mecánica',tipo:'Pieza estándar según plano Ombú',prod_final:'Acoplados y semirremolques',material:'Acero muelle',peso:'A completar',dimensiones:'Según plano actualizado Ombú',nota:'OC Ombú N° 50011830 · 410 u · USD 53,76/u · Total USD 22.041,60 · Entrega estimada 20/08/2026 · Elástico trasero 12 hojas 65,90 kg · Cód. Ombú: 805950'},
+   refs:[],
+   prov:{Nombre:'Shandong Luyang Auto Parts Co., Ltd.',Región:'Weifang, Shandong, China',Incoterm:'FOB Qingdao',Banco:'Bank of China Weifang · SWIFT: BKCHCNBJ500'},
+   pagos:[{l:'Anticipo 30% · USD 6.612,48',ok:false,d:''},{l:'Saldo 70%',ok:false,d:''}],
+   com:{'Lead':'A confirmar','Pago':'A definir','MOQ':'A confirmar','Contenedor':'A confirmar','Puerto':'A definir','Flete':'','Arribo est.':'','Nota':'50011830 · 21/05/2026'},
+   pu:'u',vol:'',fecha:''},
+
+  {id:'p9',nombre:'Lanza y Vantren (018975 / 029102)',fase:'sourcing',fases:[1,1,2,0,0,0,0,0,0],
+   ns:'MJ lidera búsqueda de proveedores en China · Planos detallados disponibles',
+   nso:'Planos recibidos ✓ · MJ identificó fabricante local vía Kemi · Investigación de mercado en curso',
+   tec:{nombre:'Lanza armada + Vantren doble 3 ejes',tipo:'Piezas bajo plano · conjuntos soldados',prod_final:'Remolque',material:'Tubo estructural + Acero estructural',peso:'Lanza ~58 kg · Vantren ~312 kg',dimensiones:'A confirmar con proveedor',nota:'Lanza 018975: estructura soldada tipo A · Vantren 029102: chasis soldado complejo, múltiples subconjuntos · Mismo proveedor para ambos · Planos detallados disponibles'},
+   refs:['018975','029102'],
+   prov:{Nombre:'En evaluación (fabricante local vía Kemi)',Región:'China',Incoterm:'A definir'},
+   pagos:[],
+   com:{'Lead':'A confirmar','Pago':'A definir','MOQ':'A confirmar','Contenedor':'A confirmar','Puerto':'A definir','Flete':'','Arribo est.':'','Nota':''},
+   pu:'u',vol:'',fecha:''},
+
+  {id:'p11',nombre:'Llantas de aluminio',fase:'sourcing',fases:[1,1,2,0,0,0,0,0,0],
+   ns:'Esperar estabilización del mercado de aluminio en China · Retomar cotización cuando el proveedor pueda dar precio firme',
+   nso:'Mercado aluminio chino con fuerte volatilidad (RMB 24.050–24.610/ton en 10 días) · Recomendación Bamboo: esperar',
+   tec:{nombre:'Llanta de aluminio para semirremolque',tipo:'Pieza estándar',prod_final:'Acoplados y semirremolques',material:'Aluminio',peso:'A confirmar',dimensiones:'A confirmar',nota:'Muestras recibidas y evaluadas por Ombú ✓ · Sin precio firme por volatilidad del aluminio chino · Bamboo recomienda esperar · Retomar cuando mercado se estabilice'},
    refs:[],
    prov:{Nombre:'Shandong Luyang Auto Parts Co., Ltd.',Región:'Weifang, Shandong, China',Incoterm:'FOB Qingdao',Banco:'Bank of China Weifang · SWIFT: BKCHCNBJ500'},
    pagos:[],
-   com:{Lead:'A confirmar',Pago:'A definir',MOQ:'A confirmar',Contenedor:'410 u · 1×40HC',Puerto:'Qingdao'},
+   com:{'Lead':'A confirmar','Pago':'A definir','MOQ':'A confirmar','Contenedor':'A confirmar','Puerto':'A definir','Flete':'','Arribo est.':'','Nota':''},
    pu:'u',vol:'',fecha:''},
 
-  {id:'p9',nombre:'Lanza de remolque',fase:'sourcing',fases:[1,1,2,0,0,0,0,0,0],
-   ns:'MJ requirió planos detallados a Ombú · Esperando planos para avanzar con sourcing',
-   nso:'Juan coordina · MJ Lim lidera búsqueda de proveedor en China',
-   tec:{nombre:'Lanza armada (Hitch Assembly)',tipo:'Pieza bajo plano · conjunto soldado',prod_final:'Remolque',material:'Tubo estructural',peso:'~58 kg',dimensiones:'A confirmar con planos detallados',nota:'Estructura soldada tipo A · Mecanizado agujero de perno · MJ solicitó planos detallados 19/05/2026'},
-   refs:['018975'],
-   prov:{Nombre:'En búsqueda',Región:'En evaluación',Incoterm:'A definir'},
-   pagos:[],
-   com:{Lead:'A confirmar',Pago:'A definir',MOQ:'A confirmar',Contenedor:'A confirmar',Puerto:'A definir'},
-   pu:'u',vol:'',fecha:''},
-
-  {id:'p10',nombre:'Vantren doble 3 ejes',fase:'sourcing',fases:[1,1,2,0,0,0,0,0,0],
-   ns:'MJ requirió planos detallados a Ombú · Esperando planos para avanzar con sourcing',
-   nso:'Juan coordina · MJ Lim lidera búsqueda de proveedor en China',
-   tec:{nombre:'Vantren doble 3 ejes',tipo:'Pieza bajo plano · conjunto soldado complejo',prod_final:'Remolque',material:'Acero estructural',peso:'~312 kg',dimensiones:'A confirmar con planos detallados',nota:'Chasis soldado complejo · Múltiples subconjuntos · Zonas críticas sin soldadura · MJ solicitó planos 19/05/2026'},
-   refs:['029102'],
-   prov:{Nombre:'En búsqueda',Región:'En evaluación',Incoterm:'A definir'},
-   pagos:[],
-   com:{Lead:'A confirmar',Pago:'A definir',MOQ:'A confirmar',Contenedor:'A confirmar',Puerto:'A definir'},
-   pu:'u',vol:'',fecha:''},
-
-  {id:'p11',nombre:'Llantas de aluminio',fase:'evaluacion',fases:[1,1,1,1,1,2,0,0,0],
-   ns:'Ombú evalúa muestras · Pendiente decisión de compra',
-   nso:'Proveedor encontrado · Shandong Luyang Auto Parts · Decisión de Ombú pendiente',
-   tec:{nombre:'Llanta de aluminio para semirremolque',tipo:'Pieza estándar',prod_final:'Acoplados y semirremolques',material:'Aluminio',peso:'A confirmar',dimensiones:'A confirmar',nota:'Muestras recibidas y evaluadas por Ombú · Precio FOB a confirmar · 640 u/contenedor'},
+  {id:'p12',nombre:'Llantas de acero',fase:'implementacion',fases:[1,1,1,1,1,1,2,0,0],
+   ns:'Ombú paga anticipo para iniciar producción · PI + PL ya enviados',
+   nso:'OC 50011837 emitida ✓ · PI + PL enviados y confirmados por Jesús Herrera (Ombú Compras) ✓',
+   tec:{nombre:'Llanta de acero para semirremolque',tipo:'Pieza estándar',prod_final:'Acoplados y semirremolques',material:'Acero',peso:'A confirmar',dimensiones:'A confirmar',nota:'OC Ombú 50011837 ✓ · USD 32,76/u FOB Qingdao (actualizado) · 640 u/contenedor · Lead time 20 días'},
    refs:[],
    prov:{Nombre:'Shandong Luyang Auto Parts Co., Ltd.',Región:'Weifang, Shandong, China',Incoterm:'FOB Qingdao',Banco:'Bank of China Weifang · SWIFT: BKCHCNBJ500'},
-   pagos:[],
-   com:{Lead:'40 días',Pago:'A definir',MOQ:'A confirmar',Contenedor:'640 u · 1×40HC',Puerto:'Qingdao'},
-   pu:'u',vol:'',fecha:''},
-
-  {id:'p12',nombre:'Llantas de acero',fase:'evaluacion',fases:[1,1,1,1,1,2,0,0,0],
-   ns:'Ombú evalúa muestras · Pendiente decisión de compra',
-   nso:'Proveedor encontrado · Shandong Luyang Auto Parts · Decisión de Ombú pendiente',
-   tec:{nombre:'Llanta de acero para semirremolque',tipo:'Pieza estándar',prod_final:'Acoplados y semirremolques',material:'Acero',peso:'A confirmar',dimensiones:'A confirmar',nota:'Muestras recibidas y evaluadas por Ombú · USD 33,08/u FOB Qingdao · 640 u/contenedor'},
-   refs:[],
-   prov:{Nombre:'Shandong Luyang Auto Parts Co., Ltd.',Región:'Weifang, Shandong, China',Incoterm:'FOB Qingdao',Banco:'Bank of China Weifang · SWIFT: BKCHCNBJ500'},
-   pagos:[],
-   com:{Lead:'40 días',Pago:'A definir',MOQ:'A confirmar',Contenedor:'640 u · 1×40HC',Puerto:'Qingdao'},
+   pagos:[{l:'Anticipo 30%',ok:false,d:''},{l:'Saldo 70%',ok:false,d:''}],
+   com:{'Lead':'A confirmar','Pago':'A definir','MOQ':'A confirmar','Contenedor':'A confirmar','Puerto':'A definir','Flete':'','Arribo est.':'','Nota':'50011837'},
    pu:'u',vol:'',fecha:''},
 
   {id:'p13',nombre:'Patas de apoyo de remolque',fase:'evaluacion',fases:[1,1,1,1,1,2,0,0,0],
-   ns:'Ombú evalúa muestras · Pendiente decisión de compra',
-   nso:'Proveedor encontrado · Shandong Luyang Auto Parts · Decisión de Ombú pendiente',
+   ns:'Ombú decidió no avanzar — conforme con proveedor actual · Proyecto en pausa',
+   nso:'Bamboo recomienda retomar si cambian condiciones · Precio logrado: USD 120,23/u (−17% vs oct.2025) · Proveedor validado en visita abril 2026',
    tec:{nombre:'Patas de apoyo de remolque (Landing Gear)',tipo:'Pieza estándar',prod_final:'Acoplados y semirremolques',material:'Acero',peso:'A confirmar',dimensiones:'A confirmar',nota:'Muestras recibidas y evaluadas por Ombú · USD 120,23/u FOB Qingdao · 200 u/contenedor'},
    refs:[],
    prov:{Nombre:'Shandong Luyang Auto Parts Co., Ltd.',Región:'Weifang, Shandong, China',Incoterm:'FOB Qingdao',Banco:'Bank of China Weifang · SWIFT: BKCHCNBJ500'},
    pagos:[],
-   com:{Lead:'40 días',Pago:'A definir',MOQ:'A confirmar',Contenedor:'200 u · 1×40HC',Puerto:'Qingdao'},
+   com:{'Lead':'A confirmar','Pago':'A definir','MOQ':'A confirmar','Contenedor':'A confirmar','Puerto':'A definir','Flete':'','Arribo est.':'','Nota':''},
    pu:'u',vol:'',fecha:''}];
 
 var FN=['F0','F1','F2','F3','F4','F5','F6','F7','F8'];
@@ -798,13 +944,14 @@ function render(){
     var cA=canEdit('actual'),cL=canEdit('landed'),cV=canEdit('vol'),cF=canEdit('fecha'),cP=canEdit('prov');
     var pnote=isBamboo()?'✦ Bamboo: edita todos los campos del análisis':'✦ Ombú: podés editar costo actual, proveedor origen y volumen anual';
     var editTecBtn=isBamboo()?`<button class="ebtn" id="etbtn_${item.id}" onclick="event.stopPropagation();toggleEditTec('${item.id}')"><i class="ti ti-pencil"></i> Editar</button>`:'';
+    var editItemBtn=isBamboo()?`<button class="edit-item-btn" onclick="event.stopPropagation();openModal('${item.id}')"><i class="ti ti-settings" style="font-size:12px"></i> Editar ítem</button>`:'';
 
     div.innerHTML=`
       <div class="ich" onclick="tog(this.parentElement)">
         <div class="in" style="flex:1;min-width:130px">${item.nombre}</div>
         <div class="fsw">${fsHtml}</div>
         <div class="itags"><span class="tag tm">${item.tec.tipo||'—'}</span></div>
-        <i class="ti ti-chevron-down ichev"></i>
+        ${editItemBtn}<i class="ti ti-chevron-down ichev"></i>
       </div>
       <div class="icb">
         <div class="nstep"><div class="nsl w">Próximo paso</div><div><div class="nst">${item.ns}</div><div class="nso">${item.nso}</div></div></div>
@@ -867,6 +1014,206 @@ function render(){
 
 function tog(c){c.classList.toggle('open');}
 function fil(t,b){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));b.classList.add('on');document.querySelectorAll('.ic').forEach(c=>{var f=c.getAttribute('data-fase');c.style.display=(t==='todos'||t===f)?'':'none';});}
+
+
+// ═══════════════════════════════════════════
+//  EDIT MODAL
+// ═══════════════════════════════════════════
+var FASE_LABELS=['Origen comercial','Definición req.','Sourcing','Validación técnica','RFQ y cotización','Evaluación','Implementación','Logística','Estabilización'];
+var currentModalId=null;
+
+function openModal(id){
+  if(!isBamboo()) return;
+  currentModalId=id;
+  var item=ITEMS.find(i=>i.id===id);
+  if(!item) return;
+
+  document.getElementById('modal-item-name').textContent='Editar · '+item.nombre;
+
+  // Fase selector
+  var fsel=document.getElementById('modal-fase-sel');
+  fsel.innerHTML='';
+  // determine current active fase index
+  var activeIdx=item.fases.indexOf(2);
+  FASE_LABELS.forEach(function(label,i){
+    var btn=document.createElement('button');
+    btn.className='fase-opt'+(i<activeIdx?' sel-done':i===activeIdx?' sel-active':'');
+    btn.textContent='F'+i+' · '+label;
+    btn.onclick=function(){
+      // click sets this as active, all before as done, all after as pend
+      document.querySelectorAll('.fase-opt').forEach(function(b,j){
+        b.className='fase-opt'+(j<i?' sel-done':j===i?' sel-active':'');
+      });
+    };
+    fsel.appendChild(btn);
+  });
+
+  // Próximo paso
+  document.getElementById('modal-ns').value=item.ns||'';
+  document.getElementById('modal-nso').value=item.nso||'';
+
+  // Importante
+  document.getElementById('modal-imp').value=item.imp||'';
+  document.getElementById('modal-impo').value=item.impo||'';
+
+  // Proveedor
+  document.getElementById('modal-prov-nombre').value=item.prov.Nombre||'';
+  document.getElementById('modal-prov-region').value=item.prov.Región||'';
+  document.getElementById('modal-prov-incoterm').value=item.prov.Incoterm||'';
+  document.getElementById('modal-prov-invoice').value=item.prov.Invoice||'';
+
+  // Comercial
+  document.getElementById('modal-com-lead').value=item.com.Lead||'';
+  document.getElementById('modal-com-pago').value=item.com.Pago||'';
+  document.getElementById('modal-com-moq').value=item.com.MOQ||'';
+  document.getElementById('modal-com-cont').value=item.com.Contenedor||'';
+  document.getElementById('modal-com-puerto').value=item.com.Puerto||'';
+  document.getElementById('modal-com-nota').value=item.com.Nota||item.com['Arribo est.']||item.com['OC Ombú']||'';
+
+  document.getElementById('edit-modal').classList.remove('hidden');
+  document.body.style.overflow='hidden';
+}
+
+function closeModal(){
+  document.getElementById('edit-modal').classList.add('hidden');
+  document.body.style.overflow='';
+  currentModalId=null;
+}
+
+function closeModalOutside(e){
+  if(e.target===document.getElementById('edit-modal')) closeModal();
+}
+
+async function saveModal(){
+  if(!currentModalId) return;
+  var item=ITEMS.find(i=>i.id===currentModalId);
+  if(!item) return;
+
+  // Read fase from selector
+  var opts=document.querySelectorAll('.fase-opt');
+  var activeIdx=-1;
+  opts.forEach(function(b,i){ if(b.classList.contains('sel-active')) activeIdx=i; });
+  if(activeIdx>=0){
+    item.fases=item.fases.map(function(_,i){ return i<activeIdx?1:i===activeIdx?2:0; });
+    // update fase category
+    var faseMap={6:'implementacion',7:'transito',8:'entregado',3:'tecnica',4:'cotizacion',5:'evaluacion'};
+    item.fase=faseMap[activeIdx]||'sourcing';
+  }
+
+  // Próximo paso
+  item.ns=document.getElementById('modal-ns').value;
+  item.nso=document.getElementById('modal-nso').value;
+
+  // Importante
+  item.imp=document.getElementById('modal-imp').value;
+  item.impo=document.getElementById('modal-impo').value;
+
+  // Proveedor
+  item.prov.Nombre=document.getElementById('modal-prov-nombre').value;
+  item.prov.Región=document.getElementById('modal-prov-region').value;
+  item.prov.Incoterm=document.getElementById('modal-prov-incoterm').value;
+  item.prov.Invoice=document.getElementById('modal-prov-invoice').value;
+
+  // Comercial
+  item.com.Lead=document.getElementById('modal-com-lead').value;
+  item.com.Pago=document.getElementById('modal-com-pago').value;
+  item.com.MOQ=document.getElementById('modal-com-moq').value;
+  item.com.Contenedor=document.getElementById('modal-com-cont').value;
+  item.com.Puerto=document.getElementById('modal-com-puerto').value;
+  var notaVal=document.getElementById('modal-com-nota').value;
+  if(notaVal) item.com.Nota=notaVal;
+
+  // Save to storage
+  var d=collectData(currentModalId);
+  d.data_version=DATA_VERSION;
+  d.item_ns=item.ns; d.item_nso=item.nso;
+  d.item_imp=item.imp; d.item_impo=item.impo;
+  d.item_fases=item.fases; d.item_fase=item.fase;
+  d.item_prov=item.prov; d.item_com=item.com;
+  await save2(currentModalId, d);
+
+  // Re-render
+  var btn=document.getElementById('modal-save-btn');
+  btn.classList.add('saved'); btn.innerHTML='<i class="ti ti-check"></i> Guardado';
+  setTimeout(function(){
+    btn.classList.remove('saved'); btn.innerHTML='<i class="ti ti-device-floppy"></i> Guardar cambios';
+    closeModal();
+    // Re-render items
+    render();
+    loadAll();
+  },1000);
+}
+
+// Extend applyData to restore modal-saved fields
+var DATA_VERSION='v20260528';
+var _origApply=applyData;
+applyData=function(id,d){
+  _origApply(id,d);
+  var item=ITEMS.find(i=>i.id===id);
+  if(!item) return;
+  // Only restore editorial fields if saved with current version
+  if(d.item_fases && d.data_version===DATA_VERSION) item.fases=d.item_fases;
+  if(d.item_fase  && d.data_version===DATA_VERSION) item.fase=d.item_fase;
+  if(d.item_prov  && d.data_version===DATA_VERSION) item.prov=d.item_prov;
+  if(d.item_com   && d.data_version===DATA_VERSION) item.com=d.item_com;
+  // ns/nso/imp/impo: only restore if version matches (prevents stale next steps)
+  if(d.item_ns    && d.data_version===DATA_VERSION) item.ns=d.item_ns;
+  if(d.item_nso   && d.data_version===DATA_VERSION) item.nso=d.item_nso;
+  if(d.item_imp   && d.data_version===DATA_VERSION) item.imp=d.item_imp;
+  if(d.item_impo  && d.data_version===DATA_VERSION) item.impo=d.item_impo;
+};
+
+
+// Auto-calculate bloqueos badge
+function updateBloqBadge(){
+  var reds=document.querySelectorAll('.bqd.r').length;
+  var yellows=document.querySelectorAll('.bqd.y').length;
+  var badge=document.getElementById('bloq-badge');
+  if(!badge) return;
+  var txt='';
+  if(reds>0) txt+=reds+' crítico'+(reds>1?'s':'');
+  if(reds>0&&yellows>0) txt+=' · ';
+  if(yellows>0) txt+=yellows+' atención';
+  badge.textContent=txt||'Sin bloqueos';
+  badge.className=reds>0?'tag td':'tag tw';
+}
+
+// call on login
+var _origRender=render;
+render=function(){_origRender();updateBloqBadge();updateCounts();};
+
+// Auto-update item counts in tabs and KPI after render
+function updateCounts(){
+  var total=ITEMS.length;
+  // KPI
+  var kpiEl=document.querySelector('.kv');
+  if(kpiEl && kpiEl.nextElementSibling && kpiEl.nextElementSibling.textContent.includes('seguimiento')){
+    kpiEl.textContent=total;
+  }
+  // Tabs
+  var faseCounts={};
+  ITEMS.forEach(function(item){ faseCounts[item.fase]=(faseCounts[item.fase]||0)+1; });
+  var tabMap={
+    'todos':'Todos',
+    'transito':'En tránsito',
+    'cotizacion':'Cotización',
+    'tecnica':'Val. técnica',
+    'evaluacion':'Evaluación',
+    'implementacion':'Implementación',
+    'sourcing':'Sourcing',
+    'entregado':'Entregado'
+  };
+  document.querySelectorAll('.tab').forEach(function(btn){
+    var onclick=btn.getAttribute('onclick')||'';
+    var m=onclick.match(/fil\('(\w+)'/);
+    if(!m) return;
+    var fase=m[1];
+    var label=tabMap[fase]||fase;
+    var count=fase==='todos'?total:(faseCounts[fase]||0);
+    btn.textContent=label+' ('+count+')';
+  });
+}
+
 </script>
 </body>
 </html>
